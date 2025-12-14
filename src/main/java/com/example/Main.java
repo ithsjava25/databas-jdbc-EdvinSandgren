@@ -160,25 +160,25 @@ public class Main {
         System.out.println("Enter mission ID:");
         var missionId = scanner.nextLine();
 
-        String query = "select * from moon_mission where mission_id = ?";
+        String query = "select spacecraft from moon_mission where mission_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, missionId);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
-                System.out.println(result.getString(2));
+                System.out.println(result.getString("spacecraft"));
             }
         }
     }
 
     private void listMissions(Connection connection) throws SQLException {
 
-        String query = "select * from moon_mission";
+        String query = "select spacecraft from moon_mission";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
-                System.out.println(result.getString(2));
+                System.out.println(result.getString("spacecraft"));
             }
         }
     }
