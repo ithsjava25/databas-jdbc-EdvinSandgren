@@ -34,32 +34,38 @@ public class Main {
 
             boolean validCredentials = false;
 
-            String query = "select * from account";
+            String query = "select user_id from account where name = ? and password = ?";
 
             try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, user);
+                statement.setString(2, password);
                 ResultSet result = statement.executeQuery();
-                while (result.next()) {
-                    if ((result.getString(2) + " " + result.getString(3))
-                            .equals(user + " " + password)) {
-                        validCredentials = true;
-                    }
-                }
+                validCredentials = result.next();
             }
 
             if (!validCredentials) {
-                IO.println("Invalid username or password");
-            }
+                System.out.println("Invalid username or password");
+            } else {
+                System.out.println("\nMenu:");
+                System.out.println("1. List all missions");
+                System.out.println("2. List mission by ID");
+                System.out.println("3. List missions per year");
+                System.out.println("4. Create account");
+                System.out.println("5. Update password");
+                System.out.println("6. Delete account");
+                System.out.print("Select an option: ");
 
-            var option = scanner.nextLine();
+                var option = scanner.nextLine();
 
-            switch (option) {
-                case "1" -> listMissions(connection);
-                case "2" -> listMissionById(connection, scanner);
-                case "3" -> listMissionsPerYear(connection, scanner);
-                case "4" -> createAccount(connection, scanner);
-                case "5" -> updatePassword(connection, scanner);
-                case "6" -> deleteAccount(connection, scanner);
-                default -> System.out.println("Invalid option");
+                switch (option) {
+                    case "1" -> listMissions(connection);
+                    case "2" -> listMissionById(connection, scanner);
+                    case "3" -> listMissionsPerYear(connection, scanner);
+                    case "4" -> createAccount(connection, scanner);
+                    case "5" -> updatePassword(connection, scanner);
+                    case "6" -> deleteAccount(connection, scanner);
+                    default -> System.out.println("Invalid option");
+                }
             }
 
         } catch (SQLException e) {
@@ -117,7 +123,7 @@ public class Main {
         System.out.println("Enter password:");
         String password = scanner.nextLine();
 
-        String name = firstName.substring(0, 2) + lastName.substring(0, 2);
+        String name = firstName.substring(0, Math.min(firstName.length(), 3)-1) + lastName.substring(0, Math.min(lastName.length(), 3)-1);
 
         String insert = "insert into account (name, password, first_name, last_name, ssn) values (?, ?, ?, ?, ?)";
 
@@ -135,8 +141,8 @@ public class Main {
 
     private void listMissionsPerYear(Connection connection, Scanner scanner) throws SQLException {
 
-        System.out.println("Enter year:");
-        int year = scanner.nextInt();
+        System.out.println("Enter year: ");
+        int year = Integer.parseInt(scanner.nextLine());
 
         String query = "select count(launch_date) from moon_mission where year(launch_date) = ?";
 
